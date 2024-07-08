@@ -3,3 +3,5 @@ node_modules/
 .DS_Store
 .terraform/*
 .terraform.lock.hcl
+*.tfstate
+*.tfstate.backup
