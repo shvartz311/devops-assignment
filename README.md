@@ -24,89 +24,6 @@ This project involves deploying a backend environment for an online orders syste
 
 ## Configuration Details
 
-### AWS Provider Setup
-
-**provider.tf**
-```hcl
-provider "aws" {
-  region = "us-east-1"
-}
-```
-
-### VPC and Networking
-
-**vpc.tf**
-```hcl
-resource "aws_vpc" "app_vpc" {
-  cidr_block = "10.0.0.0/16"
-  enable_dns_support = true
-  enable_dns_hostnames = true
-}
-
-resource "aws_subnet" "public_subnet1" {
-  vpc_id            = aws_vpc.app_vpc.id
-  cidr_block        = "10.0.1.0/24"
-  availability_zone = "us-east-1a"
-}
-
-resource "aws_subnet" "public_subnet2" {
-  vpc_id            = aws_vpc.app_vpc.id
-  cidr_block        = "10.0.2.0/24"
-  availability_zone = "us-east-1b"
-}
-
-resource "aws_internet_gateway" "igw" {
-  vpc_id = aws_vpc.app_vpc.id
-}
-```
-
-### Elastic Kubernetes Service (EKS)
-
-**eks.tf**
-```hcl
-# IAM Role for EKS Cluster
-resource "aws_iam_role" "eks_cluster" {
-  # Role configuration...
-}
-
-# IAM Role for EKS Worker Nodes
-resource "aws_iam_role" "eks_nodes" {
-  # Role configuration...
-}
-
-# EKS Cluster Configuration
-resource "aws_eks_cluster" "app_cluster" {
-  # Cluster configuration...
-}
-
-# EKS Worker Nodes Configuration
-resource "aws_eks_node_group" "node_group" {
-  # Node group configuration...
-}
-```
-
-### Amazon DocumentDB
-
-**documentdb.tf**
-```hcl
-resource "aws_docdb_subnet_group" "db_subnet" {
-  # Subnet group configuration...
-}
-
-resource "aws_docdb_cluster" "app_db" {
-  # Cluster configuration...
-}
-```
-
-### AWS Elastic Container Registry (ECR)
-
-**ecr.tf**
-```hcl
-resource "aws_ecr_repository" "app_repo" {
-  name = "app-repository"
-}
-```
-
 ## Deployment Instructions
 
 1. **Initialize Terraform:**
@@ -126,10 +43,34 @@ resource "aws_ecr_repository" "app_repo" {
    - Check the AWS Console to confirm that all resources are created successfully.
    - Use `kubectl` to verify the Kubernetes cluster functionality.
 
-## Additional Information
+## Docker Build Process
 
-- **Security Considerations:** Ensure all IAM roles and policies adhere to the principle of least privilege.
-- **Monitoring and Logging:** Implement AWS CloudWatch for comprehensive monitoring and logging.
+The Docker build process involves creating a Docker image that contains the Node.js application, ready to be deployed in any environment that supports Docker containers.
+
+### Dockerfile Configuration
+
+The `Dockerfile` is configured to:
+
+- Use the official Node.js LTS (Long-Term Support) image as a base.
+- Install necessary packages and dependencies outlined in `package.json`.
+- Set the `MONGODB_URL` environment variable to connect to Amazon DocumentDB.
+- Expose port 3000 for communication with the Node.js application.
+
+```Dockerfile
+FROM node:lts
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+ENV MONGODB_URL="mongodb://username:password@docdb-endpoint:27017/dbname"
+EXPOSE 3000
+CMD ["node", "index.js"]
+```
+
+## Helm
+
+Helm can be used locally or through a deployment tool like ArgoCD to pull the image from the ECR and deploy the application unto the Kubernetes infrastructure meant to run it. In this case, some basic charts and yamls were utilized to deploy this application through local helm commands unto the infrastructure in AWS.
+
 
 ## Conclusion
 
