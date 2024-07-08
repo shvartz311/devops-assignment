@@ -29,6 +29,57 @@ resource "aws_subnet" "public_subnet2" {
   }
 }
 
+resource "aws_subnet" "private_subnet1" {
+  vpc_id            = aws_vpc.app_vpc.id
+  cidr_block        = "10.0.3.0/24"
+  availability_zone = "us-east-1a"
+
+  tags = {
+    Name = "private_subnet1"
+  }
+}
+
+resource "aws_subnet" "private_subnet2" {
+  vpc_id            = aws_vpc.app_vpc.id
+  cidr_block        = "10.0.4.0/24"
+  availability_zone = "us-east-1b"
+
+  tags = {
+    Name = "private_subnet2"
+  }
+}
+
+resource "aws_nat_gateway" "nat_gateway" {
+  allocation_id = aws_eip.nat_eip.id
+  subnet_id     = aws_subnet.public_subnet1.id
+  depends_on    = [aws_internet_gateway.igw]
+
+  tags = {
+    Name = "nat_gateway"
+  }
+}
+
+resource "aws_eip" "nat_eip" {
+  tags = {
+    Name = "nat_eip"
+  }
+}
+
+resource "aws_route_table" "private_route_table" {
+  vpc_id = aws_vpc.app_vpc.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.nat_gateway.id
+  }
+}
+
+resource "aws_route_table_association" "private_route_table_association" {
+  subnet_id      = aws_subnet.private_subnet1.id
+  route_table_id = aws_route_table.private_route_table.id
+}
+
+
 
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.app_vpc.id
