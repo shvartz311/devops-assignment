@@ -14,4 +14,12 @@ COPY . .
 
 EXPOSE 3000
 
+# Use arguments to pass MongoDB credentials
+ARG MONGODB_USERNAME
+ARG MONGODB_PASSWORD
+ARG MONGODB_ENDPOINT
+
+# Use environment variable to store the MongoDB connection URL
+ENV MONGODB_URL=mongodb://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@${MONGODB_ENDPOINT}
+
 CMD [ "node", "index.js" ]
