@@ -10,5 +10,5 @@ resource "aws_docdb_cluster" "app_db" {
 
 resource "aws_docdb_subnet_group" "db_subnet" {
   name       = "docdb-subnet"
-  subnet_ids = [aws_subnet.app_subnet.id]
+  subnet_ids = [aws_subnet.public_subnet1.id, aws_subnet.public_subnet2.id]
 }
