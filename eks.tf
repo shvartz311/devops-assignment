@@ -19,7 +19,7 @@ resource "aws_eks_node_group" "node_group" {
   cluster_name    = aws_eks_cluster.app_cluster.name
   node_group_name = "app-node-group"
   node_role_arn   = aws_iam_role.eks_nodes.arn
-  subnet_ids      = [aws_subnet.public_subnet1.id, aws_subnet.public_subnet2.id]
+  subnet_ids      = [aws_subnet.private_subnet1.id]
 
   scaling_config {
     desired_size = 2
@@ -97,4 +97,43 @@ resource "aws_iam_role_policy_attachment" "ecr_read_only" {
   role       = aws_iam_role.eks_nodes.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
   depends_on = [aws_iam_role.eks_nodes]
+}
+
+resource "aws_security_group" "eks_nodes_sg" {
+  vpc_id = aws_vpc.app_vpc.id
+
+  ingress {
+    description = "Kubelet and pods"
+    from_port   = 10250
+    to_port     = 10250
+    protocol    = "tcp"
+    self        = true
+  }
+
+  ingress {
+    description = "HTTP"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "HTTPS"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "eks-nodes-sg"
+  }
 }
