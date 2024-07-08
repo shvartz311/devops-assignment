@@ -32,6 +32,45 @@ resource "aws_eks_node_group" "node_group" {
   ]
 }
 
+resource "aws_security_group" "eks_nodes_sg" {
+  vpc_id = aws_vpc.app_vpc.id
+
+  ingress {
+    description = "Kubelet and pods"
+    from_port   = 10250
+    to_port     = 10250
+    protocol    = "tcp"
+    self        = true
+  }
+
+  ingress {
+    description = "HTTP"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "HTTPS"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "eks-nodes-sg"
+  }
+}
+
 # IAM Role for EKS Cluster
 resource "aws_iam_role" "eks_cluster" {
   name = "eks_cluster_role"

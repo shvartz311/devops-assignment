@@ -22,8 +22,11 @@ This project involves deploying a backend environment for an online orders syste
 - **kubectl:** Configured to interact with Kubernetes
 - **Docker:** For managing Docker containers
 
+<<<<<<< HEAD
 ## Configuration Details
 
+=======
+>>>>>>> master
 ## Deployment Instructions
 
 1. **Initialize Terraform:**
