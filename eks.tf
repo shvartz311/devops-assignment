@@ -53,11 +53,13 @@ resource "aws_iam_role" "eks_cluster" {
 resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
   role       = aws_iam_role.eks_cluster.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+  depends_on = [aws_iam_role.eks_cluster]
 }
 
 resource "aws_iam_role_policy_attachment" "eks_vpc_resources" {
   role       = aws_iam_role.eks_cluster.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
+  depends_on = [aws_iam_role.eks_cluster]
 }
 
 # IAM Role for EKS Worker Nodes
@@ -82,14 +84,17 @@ resource "aws_iam_role" "eks_nodes" {
 resource "aws_iam_role_policy_attachment" "worker_node_policy" {
   role       = aws_iam_role.eks_nodes.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+  depends_on = [aws_iam_role.eks_nodes]
 }
 
 resource "aws_iam_role_policy_attachment" "cni_policy" {
   role       = aws_iam_role.eks_nodes.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSCNIPolicy"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+  depends_on = [aws_iam_role.eks_nodes]
 }
 
 resource "aws_iam_role_policy_attachment" "ecr_read_only" {
   role       = aws_iam_role.eks_nodes.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  depends_on = [aws_iam_role.eks_nodes]
 }
