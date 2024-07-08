@@ -2,4 +2,8 @@ node_modules/
 /.idea/*
 .DS_Store
 .terraform/*
+..terraform/*
 .terraform.lock.hcl
+*.tfstate
+*.tfstate.backup
+.terraform/
