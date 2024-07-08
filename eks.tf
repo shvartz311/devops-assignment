@@ -2,14 +2,15 @@
 resource "aws_eks_cluster" "app_cluster" {
   name     = "app-cluster"
   role_arn = aws_iam_role.eks_cluster.arn
+  version  = "1.30"
 
   vpc_config {
     subnet_ids = [aws_subnet.public_subnet1.id, aws_subnet.public_subnet2.id]
   }
 
   depends_on = [
-    aws_iam_policy_attachment.eks_cluster_policy,
-    aws_iam_policy_attachment.eks_vpc_resources
+    aws_iam_role_policy_attachment.eks_cluster_policy,
+    aws_iam_role_policy_attachment.eks_vpc_resources
   ]
 }
 
@@ -18,7 +19,7 @@ resource "aws_eks_node_group" "node_group" {
   cluster_name    = aws_eks_cluster.app_cluster.name
   node_group_name = "app-node-group"
   node_role_arn   = aws_iam_role.eks_nodes.arn
-  subnet_ids = [aws_subnet.public_subnet1.id, aws_subnet.public_subnet2.id]
+  subnet_ids      = [aws_subnet.public_subnet1.id, aws_subnet.public_subnet2.id]
 
   scaling_config {
     desired_size = 2
@@ -30,7 +31,6 @@ resource "aws_eks_node_group" "node_group" {
     aws_eks_cluster.app_cluster
   ]
 }
-
 
 # IAM Role for EKS Cluster
 resource "aws_iam_role" "eks_cluster" {
@@ -50,15 +50,13 @@ resource "aws_iam_role" "eks_cluster" {
   })
 }
 
-resource "aws_iam_policy_attachment" "eks_cluster_policy" {
-  name       = "eks_cluster_policy"
-  roles      = [aws_iam_role.eks_cluster.name]
+resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
+  role       = aws_iam_role.eks_cluster.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
 }
 
-resource "aws_iam_policy_attachment" "eks_vpc_resources" {
-  name       = "eks_vpc_resources"
-  roles      = [aws_iam_role.eks_cluster.name]
+resource "aws_iam_role_policy_attachment" "eks_vpc_resources" {
+  role       = aws_iam_role.eks_cluster.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
 }
 

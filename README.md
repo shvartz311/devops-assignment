@@ -1,61 +1,136 @@
-## DevOps Engineer Home Assignment
-Below is a home assignment for a DevOps Engineer position. You are requested to:
-1. Understand the requirements and use case. You may contact the interviewer for further clarification.
-2. Implement and run your deployment plan for backend environment using the most efficient tools.
-3. Present your deployment and result in the next interview session.
+# Project Overview
 
-### Requirements
-You are a DevOps engineer in a project of building an online orders system. Your task is to deploy a prototype created by the development team and make it available on the public internet.
+This project involves deploying a backend environment for an online orders system on AWS using Terraform. It includes the setup of an EKS cluster, DocumentDB for database needs, ECR for Docker image storage, and essential networking infrastructure within a VPC.
 
-Below is the information given by the development team.
+## Repository Structure
 
-### Global Environment Requirement
-- Start a MongoDB instance, it should be reachable by the prototype code and the development team
+```
+/devops-assignment
+│
+├── eks.tf          # Terraform configuration for EKS cluster setup
+├── documentdb.tf   # Configuration for DocumentDB instances
+├── ecr.tf          # ECR setup for Docker image storage
+├── vpc.tf          # VPC and networking setup
+├── provider.tf     # AWS provider configuration
+└── README.md       # Project documentation and setup instructions
+```
 
-### Backend Requirements
-- NodeJS LTS version
-- Set environment variable `MONGODB_URL="<mongodb connection url>"`, where `<mongodb connection url>` must match the [official mongodb node driver uri](https://docs.mongodb.com/drivers/node/current/fundamentals/connection/#connection-uri)
-- Navigate to package(s) directory `cd packages/<package>`
-- Build using npm `npm install`
-- Start using node `node index.js`
+## Prerequisites
 
-### Cloud Infrastructure Requirement
-Your deployment must meet the following criteria:
-- A working deployment which reachable through internet
-- IaC (Infrastructure as Code) deployment for the created AWS resources. You may use Cloudformation, Terraform or AWS CDK for that purpose 
-- Documentation for the deployment plan and the resources created
+- **Terraform:** v0.12.x or later
+- **AWS CLI:** Configured with administrator privileges
+- **kubectl:** Configured to interact with Kubernetes
+- **Docker:** For managing Docker containers
 
-### Guidebook on completing the assignment
-- Your implementation should be commited to your own public git repository, including any IaC, documentation, etc (fork this repository)
-- Create dockerfiles to match the deployment requirements
-- Create all resources using IaC tools
-- Use [Amazon Elastic Container Registry](https://us-east-1.console.aws.amazon.com/ecr/get-started) to push the images to a private repository
-- Create a [Kubernetes](https://us-east-1.console.aws.amazon.com/eks/home) cluster
-- Use helm to deploy the service(s)
-- Create a MongoDB instance and make it reachable for the deployed service, update the `MONGODB_URL` environment variable to match the mongodb connection url 
-- Expose the services to the internet using AWS Load Balancer, AWS Elastic IP, and Network Interface
-- Document the deployment steps and the resources created in the deployment as clear and detailed as possible
+## Configuration Details
 
-### Bonus Points (Optional)
-Bonus points are optional, but will be considered as a plus if implemented. Please prioritize completing the main requirements before investing time in the bonus section.
-You may choose to implement one or more of the following:
-- Supply the deployment with CI/CD automated process to push the image to ECR and deploy it to the cluster
-- Monitor the service and handle recovery for different resources
-- Maintain and handle the scaling of the service
-- Maintain and handle high availability of the service according to best practices
-- Secure the deployments according to best practices (rate limits, relevant security groups, etc)
-- Consider multi-tenant and multi-environment deployment 
-- Documentation for disaster recovery plan
-- Any other improvement that you think is relevant for this project
+### AWS Provider Setup
 
-### How will the assignment be evaluated
-When evaluating the assignment, we will consider the following:
-- The deployment plan and the resources are created and working as expected. We will trigger the API and expect a valid response
-- The documentation is clear and detailed, we will follow the documentation to understand the deployment process
-- Best practicies are followed across all functional and non-functional requirements (for example: security, cost optimization, reliability, etc)
+**provider.tf**
+```hcl
+provider "aws" {
+  region = "us-east-1"
+}
+```
 
-### General Notes
-- For performing the assignment, you will be given with AWS credentials (console and programmatic) to a dedicated account, **DO NOT COMMIT THEM IN THE CODE**
-- Make sure to create small tier resources, as the prototype demands minimal working loads
-- This assignment can be implemented in more than one way, if any further permissions are required for your implementation, contact us
-- If you have any other questions, please do not hesitate to ask
+### VPC and Networking
+
+**vpc.tf**
+```hcl
+resource "aws_vpc" "app_vpc" {
+  cidr_block = "10.0.0.0/16"
+  enable_dns_support = true
+  enable_dns_hostnames = true
+}
+
+resource "aws_subnet" "public_subnet1" {
+  vpc_id            = aws_vpc.app_vpc.id
+  cidr_block        = "10.0.1.0/24"
+  availability_zone = "us-east-1a"
+}
+
+resource "aws_subnet" "public_subnet2" {
+  vpc_id            = aws_vpc.app_vpc.id
+  cidr_block        = "10.0.2.0/24"
+  availability_zone = "us-east-1b"
+}
+
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.app_vpc.id
+}
+```
+
+### Elastic Kubernetes Service (EKS)
+
+**eks.tf**
+```hcl
+# IAM Role for EKS Cluster
+resource "aws_iam_role" "eks_cluster" {
+  # Role configuration...
+}
+
+# IAM Role for EKS Worker Nodes
+resource "aws_iam_role" "eks_nodes" {
+  # Role configuration...
+}
+
+# EKS Cluster Configuration
+resource "aws_eks_cluster" "app_cluster" {
+  # Cluster configuration...
+}
+
+# EKS Worker Nodes Configuration
+resource "aws_eks_node_group" "node_group" {
+  # Node group configuration...
+}
+```
+
+### Amazon DocumentDB
+
+**documentdb.tf**
+```hcl
+resource "aws_docdb_subnet_group" "db_subnet" {
+  # Subnet group configuration...
+}
+
+resource "aws_docdb_cluster" "app_db" {
+  # Cluster configuration...
+}
+```
+
+### AWS Elastic Container Registry (ECR)
+
+**ecr.tf**
+```hcl
+resource "aws_ecr_repository" "app_repo" {
+  name = "app-repository"
+}
+```
+
+## Deployment Instructions
+
+1. **Initialize Terraform:**
+   ```bash
+   terraform init
+   ```
+2. **Plan the Deployment:**
+   ```bash
+   terraform plan
+   ```
+3. **Apply the Configuration:**
+   ```bash
+   terraform apply
+   ```
+
+4. **Verify Deployment:**
+   - Check the AWS Console to confirm that all resources are created successfully.
+   - Use `kubectl` to verify the Kubernetes cluster functionality.
+
+## Additional Information
+
+- **Security Considerations:** Ensure all IAM roles and policies adhere to the principle of least privilege.
+- **Monitoring and Logging:** Implement AWS CloudWatch for comprehensive monitoring and logging.
+
+## Conclusion
+
+This README provides a complete guide to setting up an AWS backend for an online orders system using Terraform. Adjust the configurations as necessary based on specific project needs or updates.
