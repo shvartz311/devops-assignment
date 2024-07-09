@@ -7,12 +7,37 @@ This project involves deploying a backend environment for an online orders syste
 ```
 /devops-assignment
 │
-├── eks.tf          # Terraform configuration for EKS cluster setup
-├── documentdb.tf   # Configuration for DocumentDB instances
-├── ecr.tf          # ECR setup for Docker image storage
-├── vpc.tf          # VPC and networking setup
-├── provider.tf     # AWS provider configuration
-└── README.md       # Project documentation and setup instructions
+├── eks.tf                                  # Terraform configuration for EKS cluster setup
+├── pvc.tf                                  # PVC configuration for Kubernetes
+├── storageclass.tf                         # Storage class configuration for Kubernetes
+├── backend.tf                              # Backend for states
+├── ecr.tf                                  # ECR setup for Docker image storage
+├── vpc.tf                                  # VPC and networking setup
+├── provider.tf                             # AWS provider configuration
+└── README.md                               # Project documentation and setup instructions
+└── packages
+    └── service1
+        └── Dockerfile                      # Dockerfile for the application to connect to MongoDB
+            index.js                        # application content
+            package.json                    # application content
+    └── service2
+        └── Dockerfile                      # Dockerfile for the application to connect to MongoDB
+            index.js                        # application content
+            package.json                    # application content
+└── my-app
+    └── Chart.yaml                          # Chart.yaml
+    └── values.yaml                         # values.yaml for the node helm chart
+    └── templates
+        └── deployment.yaml                 # The deployment.yaml for the application
+        └── service.yaml                    # service.yaml to make the app available
+        └── _helpers.tpl                    # helpers.tpl
+└── mongodb
+    └── Chart.yaml                          # Chart.yaml
+    └── values.yaml                         # values.yaml for the mongodb installation (hardcoded values for the URL)
+    └── templates
+        └── mongo-pod.yaml                  # These files were created in attempts to get the app running and debugging purposes
+        └── persistent-volume-claim.yaml    # These files were created in attempts to get the app running and debugging purposes
+        └── storage-class.yaml              # These files were created in attempts to get the app running and debugging purposes
 ```
 
 ## Prerequisites
@@ -22,11 +47,8 @@ This project involves deploying a backend environment for an online orders syste
 - **kubectl:** Configured to interact with Kubernetes
 - **Docker:** For managing Docker containers
 
-<<<<<<< HEAD
 ## Configuration Details
 
-=======
->>>>>>> master
 ## Deployment Instructions
 
 1. **Initialize Terraform:**
