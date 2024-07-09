@@ -141,6 +141,6 @@ resource "aws_iam_role_policy_attachment" "ecr_read_only" {
 
 resource "aws_iam_role_policy_attachment" "ebs_driver_policy" {
   role       = aws_iam_role.eks_nodes.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEBSCSIDriverPolicy"
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
   depends_on = [aws_iam_role.eks_nodes]
 }
