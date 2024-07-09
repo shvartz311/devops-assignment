@@ -97,3 +97,29 @@ resource "aws_route_table_association" "a" {
   subnet_id      = aws_subnet.public_subnet1.id
   route_table_id = aws_route_table.route_table.id
 }
+
+resource "aws_security_group" "lb_sg" {
+  vpc_id = aws_vpc.app_vpc.id
+  name   = "load-balancer-sg"
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}

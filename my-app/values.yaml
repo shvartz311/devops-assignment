@@ -9,6 +9,5 @@ service:
   type: LoadBalancer
   port: 80
 
-env:
-  - name: MONGODB_URL
-    value: "mongodb://dbadmin:Aa123456!@$app-db-cluster.cluster-c5a8oseiy1q2.us-east-1.docdb.amazonaws.com:27017/db"
+mongodb:
+  url: "mongodb://dbadmin:Aa123456!@my-mongodb.default.svc.cluster.local:27017/db"

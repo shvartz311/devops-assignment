@@ -1,0 +1,25 @@
+replicaCount: 1
+
+auth:
+  enabled: true
+  rootPassword: your-mongodb-root-password
+  username: dbadmin
+  password: Aa123456!
+  database: DevopsAssignment
+
+service:
+  type: ClusterIP
+  port: 27017
+
+persistence:
+  enabled: true
+  size: 8Gi
+  storageClass: "standard"
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi

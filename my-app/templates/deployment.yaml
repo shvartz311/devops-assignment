@@ -20,7 +20,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: MONGODB_URL
-              value: app-db-cluster.cluster-c5a8oseiy1q2.us-east-1.docdb.amazonaws.com:27017
+              value: mongodb://dbadmin:Aa123456!@app-db-cluster.cluster-c5a8oseiy1q2.us-east-1.docdb.amazonaws.com:27017/db
           ports:
             - containerPort: 3000
           resources:
